@@ -31,14 +31,14 @@ docker build -t sqlserver2psql .
 
 Save the schema file under folder `<project root dir>/conf` (create folder, if necessary).
 
-# Steo 3 - Get certs for Postgres
+# Step 3 - Get certs for Postgres
 
 Follow steps at https://cloud.google.com/sql/docs/postgres/configure-ssl-instance to download certs.
 
 Once the certs are downloaded, copy them to folder `<project root dir>/conf`.
 
 
-# Step 3 - Run container in docker
+# Step 4 - Run container in docker
 To do the migration using docker run the `scripts/migrate.sh` script in docker using the below command:
 
 ```
