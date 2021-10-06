@@ -29,20 +29,22 @@ docker build -t sqlserver2psql .
 9. Select unicode encoding (who knows…, maybe someone has put accents in objects names, or in comments)
 10. Finish
 
-Save the schema file under folder `<project root dir>/conf` (create folder, if necessary).
+Save the schema file (ie: `schema.sql`) under folder `<project root dir>/conf` (create folder, if necessary).
 
 # Step 3 - Get certs for Postgres
 
-Follow steps at https://cloud.google.com/sql/docs/postgres/configure-ssl-instance to download certs.
+Follow steps at https://cloud.google.com/sql/docs/postgres/configure-ssl-instance to download certs. You may need to download the client key cert from the GCP Secret Manager.
 
 Once the certs are downloaded, copy them to folder `<project root dir>/conf`.
+
+Make sure the cert files are saved with these names: `server-ca.pem`, `client-cert.pem` and `client-key.pem`.
 
 
 # Step 4 - Run container in docker
 To do the migration using docker run the `scripts/migrate.sh` script in docker using the below command:
 
 ```
-docker run --name sqlserver2psql --rm -e SRC_HOST=<Azure SQL instance>.database.windows.net -e SRC_USER=<SQL Server username> -e SRC_PWD=<SQL Server password> -e SRC_DB=<SQL Server db name> -e DST_HOST=<Postgres host> -e DST_PORT=5432 -e DST_USER=<Postgres username> -e DST_PWD=<Postgres password> -e DST_DB=<Postgres db name> -e SCHEMA_FILE=<ie: /opt/data_migration/conf/schema.sql>  --mount type=bind,source="$(pwd)"/conf,target=/opt/data_migration/conf sqlserver2psql /scripts/migrate.sh
+docker run --name sqlserver2psql --rm -e SRC_HOST=<Azure SQL instance>.database.windows.net -e SRC_USER=<SQL Server username> -e SRC_PWD=<SQL Server password> -e SRC_DB=<SQL Server db name> -e DST_HOST=<Postgres host> -e DST_PORT=5432 -e DST_USER=<Postgres username> -e DST_PWD=<Postgres password> -e DST_DB=<Postgres db name> -e SCHEMA_FILE=<name of of db export file in conf folder, ie: schema.sql>  --mount type=bind,source="$(pwd)"/conf,target=/opt/data_migration/conf sqlserver2psql /scripts/migrate.sh
 ```
 
 Above command includes a mount from the local `<project root dir>/conf` folder to the `/opt/data_migration/conf` folder within the container. This `conf` folder should include the schema export file.
