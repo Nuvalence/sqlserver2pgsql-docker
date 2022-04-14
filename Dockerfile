@@ -42,5 +42,3 @@ COPY ./scripts /scripts
 RUN chmod +x /scripts/*.sh
 
 WORKDIR $MIGRATIONDIR
-
-# CMD ["sh", "/scripts/migrate.sh"]
