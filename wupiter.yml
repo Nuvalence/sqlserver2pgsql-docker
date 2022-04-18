@@ -1,0 +1,26 @@
+info:
+  name: DB Migration with sqlserver2pgsql and Docker
+  description: Generator that helps creating a Docker image for db migration from
+    Microsoft SQL Server to PostgreSQL
+  tags:
+  - database
+  - SQL
+  - migration
+  - mssql
+  - postgres
+params:
+  sourceSslRequire:
+    type: checkbox
+    defaultValue: false
+    description: Check, if source database is on Azure SQL or requires SSL connection
+    label: SQL Server requires SSL connection
+  targetSslCerts:
+    type: checkbox
+    defaultValue: false
+    description: Check, if target database requires SSL certs for connection
+    label: Postgres requires SSL certs for connection
+  postgresOnGcp:
+    type: checkbox
+    defaultValue: false
+    description: Check, if target database is running on Google Cloud
+    label: Using Google Cloud SQL for Postgres
