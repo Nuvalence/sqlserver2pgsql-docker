@@ -26,4 +26,4 @@ params:
     label: Using Google Cloud SQL for Postgres
 textReplacements:
   - target: '# {{'
-    replacement: {{
+    replacement: '{{'
