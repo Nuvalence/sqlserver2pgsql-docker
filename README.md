@@ -10,14 +10,14 @@ There's a `Dockerfile` in the project's root dir and this file is configured to
 5. Copy the `scripts/migrate.sh` script to the container to be used for running the actual migration process
 
 
-# Step 1 - Build container
+# Build container
 Run below command in the project's root folder:
 
 ```
 docker build -t sqlserver2psql .
 ```
 
-# Step 2 - Export DB schema from Azure SQL
+# Export DB schema from Azure SQL
 1. Under SQL Server Management Studio, Right click on the database you want to export
 2. Select Generate Scripts...
 3. Click "Next" on the welcome screen (if it hasn't already been deactivated)
@@ -30,26 +30,32 @@ docker build -t sqlserver2psql .
 10. Finish
 
 Save the schema file (ie: `schema.sql`) under folder `<project root dir>/conf` (create the folder, if necessary).
+{{#if (eval targetSslCerts '==' true)}}
 
-# Step 3 - Get certs for PostgreSQL
+# Get certs for PostgreSQL
 
 This step is optional and only needed when using SSL certs to connect to PostgreSQL.
 
 Copy the SSL certs to folder `<project root dir>/conf` and make sure the cert files are saved with these names: `server-ca.pem`, `client-cert.pem` and `client-key.pem`.
+{{/if}}
 
-
-# Step 4 - Run Docker container
+# Run Docker container
 To do the migration using docker run below command:
 
 ```
 docker run --name sqlserver2psql --rm -e SRC_HOST=<SQL Server instance> -e SRC_USER=<SQL Server username> -e SRC_PWD=<SQL Server password> -e SRC_DB=<SQL Server db name> -e DST_HOST=<Postgres host> -e DST_PORT=5432 -e DST_USER=<PostgreSQL username> -e DST_PWD=<PostgreSQL password> -e DST_DB=<PostgreSQL db name> -e SCHEMA_FILE=<name of of db export file in conf folder, ie: schema.sql>  --mount type=bind,source="$(pwd)"/conf,target=/opt/data_migration/conf sqlserver2psql /scripts/migrate.sh
 ```
 
-Above command includes a mount from the local `<project root dir>/conf` folder to the `/opt/data_migration/conf` folder within the container. This `conf` folder should include the schema export file and the cert files needed for Postgres.
+Above command includes a mount from the local `<project root dir>/conf` folder to the `/opt/data_migration/conf` folder within the container. This `conf` folder should include the schema export file {{#if (eval targetSslCerts '==' true)}}and the cert files needed for Postgres{{/if}}.
  
 The `scripts/migrate.sh` command will do the data migration using these steps:
 1. Run the `sqlserver2pgsql.pl` perl script to generate the PostgreSQL DDL scripts to be run before and after the data migration, and also the Kettle job files needed to run the actual data migration
 2. Run the generated 'before' script (to create the db schema)
+{{#if (eval postgresOnGcp '==' true)}}
 3. Update the Kettle job file to fix an issue around superadmin privileges in Postgres
 4. Run the Kettle job to migrate the data
 5. Run the generated 'after' script (to add primary keys, foreign keys, constraints, etc.)
+{{else}}
+3. Run the Kettle job to migrate the data
+4. Run the generated 'after' script (to add primary keys, foreign keys, constraints, etc.)
+{{/if}}

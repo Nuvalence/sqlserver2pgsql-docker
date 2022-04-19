@@ -32,10 +32,14 @@ RUN wget https://sourceforge.net/projects/jtds/files/latest/download?source=file
     rm -Rf /tmp/jtds;rm -f /tmp/jtds.zip
 
 RUN wget https://raw.githubusercontent.com/dalibo/sqlserver2pgsql/master/sqlserver2pgsql.pl -P $MIGRATIONDIR; \
+# {{#if (eval sourceSslRequire '==' true)}}
     # need ssl=require attribute to connect to Azure SQL:
     sed -i 's#<attribute><code>EXTRA_OPTION_MSSQL.instance#<attribute><code>EXTRA_OPTION_MSSQL.ssl</code><attribute>require</attribute></attribute><attribute><code>EXTRA_OPTION_MSSQL.instance#g' $MIGRATIONDIR/sqlserver2pgsql.pl; \
+# {{/if}}
+# {{#if (eval targetSslCerts '==' true)}}
     # using certs to connect to Cloud SQL for Postgres:
     sed -i "s#<attribute><code>EXTRA_OPTION_POSTGRESQL.reWriteBatchedInserts#<attribute><code>EXTRA_OPTION_POSTGRESQL.ssl</code><attribute>true</attribute></attribute>\n<attribute><code>EXTRA_OPTION_POSTGRESQL.sslmode</code><attribute>verify-ca</attribute></attribute>\n<attribute><code>EXTRA_OPTION_POSTGRESQL.sslcert</code><attribute>$MIGRATIONDIR/conf/client-cert.pem</attribute></attribute>\n<attribute><code>EXTRA_OPTION_POSTGRESQL.sslkey</code><attribute>$MIGRATIONDIR/conf/client-key.pk8</attribute></attribute>\n<attribute><code>EXTRA_OPTION_POSTGRESQL.sslrootcert</code><attribute>$MIGRATIONDIR/conf/server-ca.pem</attribute></attribute>\n<attribute><code>EXTRA_OPTION_POSTGRESQL.reWriteBatchedInserts#g" $MIGRATIONDIR/sqlserver2pgsql.pl; \
+# {{/if}}
     chmod +x $MIGRATIONDIR/sqlserver2pgsql.pl
 
 COPY ./scripts /scripts

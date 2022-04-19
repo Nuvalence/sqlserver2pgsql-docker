@@ -24,3 +24,6 @@ params:
     defaultValue: false
     description: Check, if target database is running on Google Cloud
     label: Using Google Cloud SQL for Postgres
+textReplacements:
+  - target: '# {{'
+    replacement: {{
