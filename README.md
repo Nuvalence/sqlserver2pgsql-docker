@@ -46,7 +46,7 @@ To do the migration using docker run below command:
 docker run --name sqlserver2psql --rm -e SRC_HOST=<SQL Server instance> -e SRC_USER=<SQL Server username> -e SRC_PWD=<SQL Server password> -e SRC_DB=<SQL Server db name> -e DST_HOST=<Postgres host> -e DST_PORT=5432 -e DST_USER=<PostgreSQL username> -e DST_PWD=<PostgreSQL password> -e DST_DB=<PostgreSQL db name> -e SCHEMA_FILE=<name of of db export file in conf folder, ie: schema.sql>  --mount type=bind,source="$(pwd)"/conf,target=/opt/data_migration/conf sqlserver2psql /scripts/migrate.sh
 ```
 
-Above command includes a mount from the local `<project root dir>/conf` folder to the `/opt/data_migration/conf` folder within the container. This `conf` folder should include the schema export file {{#if (eval targetSslCerts '==' true)}}and the cert files needed for Postgres{{/if}}.
+Above command includes a mount from the local `<project root dir>/conf` folder to the `/opt/data_migration/conf` folder within the container. This `conf` folder should include the schema export file{{#if (eval targetSslCerts '==' true)}} and the cert files needed for Postgres{{/if}}.
  
 The `scripts/migrate.sh` command will do the data migration using these steps:
 1. Run the `sqlserver2pgsql.pl` perl script to generate the PostgreSQL DDL scripts to be run before and after the data migration, and also the Kettle job files needed to run the actual data migration
