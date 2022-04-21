@@ -1,4 +1,3 @@
-Page up
 #!/bin/bash
   
 set -e
